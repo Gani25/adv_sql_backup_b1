@@ -181,3 +181,68 @@ select @id;
 call count_by_id(@id);
 
 select @id;
+
+
+-- Functions (Block Of SQL Statements which we can reuse again and again)
+/*
+User Defined Function
+1. Function should return something single value (scalar function)
+2. It is deterministic
+*/
+
+-- create a fn which acept customer_num and return its name
+
+delimiter $
+
+create function get_name(customer_number int)
+returns varchar(50)
+deterministic
+begin
+	declare cust_name varchar(50);
+    
+    select name into cust_name from customers
+    where customer_id = customer_number;
+    
+    return cust_name;
+    
+end $
+
+delimiter ;
+
+select get_name(10);
+select get_name(1000);
+
+select *, get_name(customer_id) cust_name from orders;
+
+select * from order_items
+where product_id = 8;
+select sum(quantity) from order_items
+where product_id = 8;
+
+delimiter $
+
+create function get_total_quantity(prod_id int)
+returns int 
+deterministic
+begin
+	declare sold_quantity int;
+    
+    select sum(quantity) into sold_quantity from order_items
+	where product_id = prod_id;
+    
+    return sold_quantity;
+    
+end $
+delimiter ;
+
+select get_total_quantity(8);
+
+select *, get_total_quantity(product_id) sold_quantities 
+from products;
+
+select distinct category from products; 
+
+select category, group_concat(name), count(*) from products
+group by category; 
+select category, group_concat(name separator ", "), count(*) from products
+group by category; 
