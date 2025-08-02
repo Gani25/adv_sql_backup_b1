@@ -19,7 +19,8 @@ prod.name, category, round(price * quantity,2) total
 from customers cust
 join orders ods on cust.customer_id = ods.customer_id
 join order_items o_its on ods.order_id = o_its.order_id
-join products prod on o_its.product_id = prod.product_id;
+join products prod on o_its.product_id = prod.product_id
+order by total desc;
 
 -- VIEWS 
 /*
@@ -51,6 +52,29 @@ delimiter ;
 
 call pr1();
 call pr1();
+drop procedure pr1;
+-- Procedure with in parameters
 
+delimiter $
+drop procedure if exists find_cust_info $
+create procedure find_cust_info
+(
+	cust_id int,
+    page_size int
+)
+begin
+	select cust.customer_id, cust.name, status, 
+	date_format(order_date,"%d-%m-%y") order_date,
+	prod.name, category, round(price * quantity,2) total
+	from customers cust
+	join orders ods on cust.customer_id = ods.customer_id
+	join order_items o_its on ods.order_id = o_its.order_id
+	join products prod on o_its.product_id = prod.product_id
+    where cust.customer_id = cust_id
+    limit page_size;
+    
+end $
 
+delimiter ;
 
+call find_cust_info(10,2);
