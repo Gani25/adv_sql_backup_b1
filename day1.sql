@@ -157,3 +157,27 @@ select @count_of_prod;
 call count_by_status("Pending", @pending_prod);
 select @pending_prod;
 
+-- inout
+
+select * from orders;
+select count(*) from orders
+where customer_id = 4;
+
+delimiter $
+
+create procedure count_by_id(
+	inout variable int
+)
+begin
+	select count(*) into variable from orders
+	where customer_id = variable;
+end $
+delimiter ;
+
+
+set @id = 10;
+select @id;
+
+call count_by_id(@id);
+
+select @id;
