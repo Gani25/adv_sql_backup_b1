@@ -122,3 +122,38 @@ for the right syntax to use near '101' at line 1
 
 */
 call find_cust_info_sort(1,100,"total","Desc");
+
+
+
+drop procedure if exists find_cust_info;
+drop procedure if exists find_cust_info_sort;
+
+
+-- procedure with - out params
+
+select * from orders;
+select count(*) from orders
+where status = "Returned";
+select count(*) from orders
+where status = "Delivered";
+select distinct status from orders;
+delimiter $$
+create procedure count_by_status(
+	prod_status varchar(50),
+    out prod_count int
+)
+begin
+	select count(*) into prod_count from orders
+	where status = prod_status;
+    
+    
+end $$
+delimiter ;
+
+select @count_of_prod;
+call count_by_status("Delivered", @count_of_prod);
+select @count_of_prod;
+
+call count_by_status("Pending", @pending_prod);
+select @pending_prod;
+
